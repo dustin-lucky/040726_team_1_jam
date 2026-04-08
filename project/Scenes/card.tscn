@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://buhrdy6mf82wf"]
+
+[ext_resource type="Script" uid="uid://fnuyrngnve03" path="res://Scripts/card.gd" id="1_0qqmn"]
+[ext_resource type="Texture2D" uid="uid://clsk0vpp0ebdd" path="res://Graphics/Sprites/playing_cards.png" id="2_brehn"]
+[ext_resource type="Texture2D" uid="uid://bgiuxng15cle2" path="res://Graphics/Sprites/card_back.png" id="3_eumee"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e6po8"]
+size = Vector2(72, 108.000015)
+
+[node name="Card" type="Node2D" unique_id=1725792458 node_paths=PackedStringArray("sprite", "area")]
+script = ExtResource("1_0qqmn")
+card_front = ExtResource("2_brehn")
+card_back = ExtResource("3_eumee")
+sprite = NodePath("Sprite2D")
+area = NodePath("Sprite2D/Area2D")
+metadata/_custom_type_script = "uid://fnuyrngnve03"
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=495373764]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_brehn")
+region_enabled = true
+region_rect = Rect2(0, 0, 390, 570)
+
+[node name="Area2D" type="Area2D" parent="Sprite2D" unique_id=348868323]
+scale = Vector2(4.9999995, 4.9999995)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Area2D" unique_id=428529324]
+position = Vector2(-2.8610218e-06, -3.814697e-06)
+scale = Vector2(0.99999976, 0.99999976)
+shape = SubResource("RectangleShape2D_e6po8")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://c004000000028"]
+
+[ext_resource type="Script" uid="uid://cwl6v7j8ot3c4" path="res://Scripts/card_def.gd" id="1_0040"]
+
+[resource]
+script = ExtResource("1_0040")
+suit = 3
+rank = 2
+value1 = 2
+value2 = 2

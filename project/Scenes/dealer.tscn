@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://drj7r3a73nefs"]
+
+[ext_resource type="Script" uid="uid://bqwp3n5sbol3a" path="res://Scripts/dealer.gd" id="1_r86xs"]
+[ext_resource type="Script" uid="uid://cqycmtekgabtn" path="res://Scripts/hand.gd" id="2_etcia"]
+
+[node name="Dealer" type="Node2D" unique_id=215000634 node_paths=PackedStringArray("hand")]
+script = ExtResource("1_r86xs")
+hand = NodePath("Hand")
+metadata/_custom_type_script = "uid://bqwp3n5sbol3a"
+
+[node name="Hand" type="Node2D" parent="." unique_id=1820203507]
+script = ExtResource("2_etcia")
+metadata/_custom_type_script = "uid://cqycmtekgabtn"
