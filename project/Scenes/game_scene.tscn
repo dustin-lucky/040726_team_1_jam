@@ -1,7 +1,26 @@
 [gd_scene format=3 uid="uid://bkf2mdh6xporu"]
 
+[ext_resource type="Script" uid="uid://p1gu1ovx8lpa" path="res://Scripts/game_animator.gd" id="1_6h5vk"]
+[ext_resource type="Script" uid="uid://d0moxtqyq6b40" path="res://Scripts/game_manager.gd" id="1_fiftr"]
 [ext_resource type="PackedScene" uid="uid://cympuolpeepu8" path="res://Scenes/table.tscn" id="1_x87qo"]
+[ext_resource type="Script" uid="uid://d2akwu4uhynld" path="res://Scripts/card_mover.gd" id="2_fiftr"]
 
 [node name="GameScene" type="Node2D" unique_id=785157636]
+
+[node name="GameStateManager" type="Node" parent="." unique_id=1889186786 node_paths=PackedStringArray("table", "game_animator")]
+script = ExtResource("1_fiftr")
+table = NodePath("../Table")
+game_animator = NodePath("../GameAnimator")
+metadata/_custom_type_script = "uid://d0moxtqyq6b40"
+
+[node name="GameAnimator" type="Node" parent="." unique_id=313105654 node_paths=PackedStringArray("table", "card_mover")]
+script = ExtResource("1_6h5vk")
+table = NodePath("../Table")
+card_mover = NodePath("CardMover")
+metadata/_custom_type_script = "uid://p1gu1ovx8lpa"
+
+[node name="CardMover" type="Node" parent="GameAnimator" unique_id=212612260]
+script = ExtResource("2_fiftr")
+metadata/_custom_type_script = "uid://d2akwu4uhynld"
 
 [node name="Table" parent="." unique_id=17428438 instance=ExtResource("1_x87qo")]

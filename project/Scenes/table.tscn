@@ -3,61 +3,87 @@
 [ext_resource type="Script" uid="uid://dlaitlplg7x3i" path="res://Scripts/table.gd" id="1_ix8et"]
 [ext_resource type="Texture2D" uid="uid://dy1ifdfmitlem" path="res://Graphics/Sprites/black_jack_table.png" id="2_4ppvu"]
 [ext_resource type="PackedScene" uid="uid://dnrmd26d2y831" path="res://Scenes/deck.tscn" id="2_5cpa6"]
-[ext_resource type="Script" uid="uid://d2akwu4uhynld" path="res://Scripts/card_mover.gd" id="3_o4lkm"]
 [ext_resource type="Script" uid="uid://c4fldivkqqgpc" path="res://Scripts/discard_pile.gd" id="4_usajj"]
 [ext_resource type="Script" uid="uid://dqbbuqlrmk3sy" path="res://Scripts/shoe.gd" id="5_o4lkm"]
 [ext_resource type="PackedScene" uid="uid://drj7r3a73nefs" path="res://Scenes/dealer.tscn" id="6_xexre"]
 [ext_resource type="PackedScene" uid="uid://bpc1ayyndqw4x" path="res://Scenes/player.tscn" id="7_usajj"]
+[ext_resource type="Script" uid="uid://nw2d22w3bo8q" path="res://Scripts/Action Selector/action_selector_dealer.gd" id="8_xexre"]
 
-[node name="Table" type="Node2D" unique_id=17428438 node_paths=PackedStringArray("discard_pile", "shoe", "card_mover", "dealer", "players")]
+[node name="Table" type="Node2D" unique_id=17428438 node_paths=PackedStringArray("discard_pile", "shoe", "players")]
 script = ExtResource("1_ix8et")
 deck_prefab = ExtResource("2_5cpa6")
 discard_pile = NodePath("DiscardPile")
 shoe = NodePath("Shoe")
-card_mover = NodePath("CardMover")
-dealer = NodePath("Dealer")
-players = [NodePath("Players/Player0"), NodePath("Players/Player1"), NodePath("Players/Player2"), NodePath("Players/Player3"), NodePath("Players/Player4")]
+players = [NodePath("Players/Player1"), NodePath("Players/Player2"), NodePath("Players/Player3"), NodePath("Players/Player4"), NodePath("Players/Player5"), NodePath("Players/Dealer")]
 metadata/_custom_type_script = "uid://dlaitlplg7x3i"
 
-[node name="CardMover" type="Node" parent="." unique_id=1765613868]
-script = ExtResource("3_o4lkm")
-metadata/_custom_type_script = "uid://d2akwu4uhynld"
-
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1494325744]
-position = Vector2(577.7778, 325)
-scale = Vector2(0.44888887, 0.4488889)
+position = Vector2(806.22217, 453.5)
+scale = Vector2(0.63925916, 0.6392592)
 texture = ExtResource("2_4ppvu")
 
 [node name="DiscardPile" type="Node2D" parent="." unique_id=540264828]
-position = Vector2(326, 175)
+position = Vector2(479, 125.000015)
+rotation = -0.5400373
 script = ExtResource("4_usajj")
 metadata/_custom_type_script = "uid://c4fldivkqqgpc"
 
 [node name="Shoe" type="Node2D" parent="." unique_id=880717675]
-position = Vector2(849, 184)
+position = Vector2(1128, 118)
+rotation = 0.32927984
 script = ExtResource("5_o4lkm")
 metadata/_custom_type_script = "uid://dqbbuqlrmk3sy"
 
-[node name="Dealer" parent="." unique_id=215000634 instance=ExtResource("6_xexre")]
-position = Vector2(575, 156)
-
 [node name="Players" type="Node2D" parent="." unique_id=499883873]
 
-[node name="Player0" parent="Players" unique_id=1199885999 instance=ExtResource("7_usajj")]
-position = Vector2(851, 349)
+[node name="Dealer" parent="Players" unique_id=215000634 node_paths=PackedStringArray("action_selector") instance=ExtResource("6_xexre")]
+position = Vector2(826, 190)
+action_selector = NodePath("ActionSelector_Dealer")
+
+[node name="ActionSelector_Dealer" type="Node" parent="Players/Dealer" unique_id=1296674544]
+script = ExtResource("8_xexre")
+metadata/_custom_type_script = "uid://nw2d22w3bo8q"
+
+[node name="Player1" parent="Players" unique_id=1199885999 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
+position = Vector2(1197, 485.99994)
 rotation = -0.80144507
+action_selector = NodePath("ActionSelector_Dealer")
 
-[node name="Player1" parent="Players" unique_id=25345839 instance=ExtResource("7_usajj")]
-position = Vector2(727, 438)
+[node name="ActionSelector_Dealer" type="Node" parent="Players/Player1" unique_id=179186405]
+script = ExtResource("8_xexre")
+metadata/_custom_type_script = "uid://nw2d22w3bo8q"
+
+[node name="Player2" parent="Players" unique_id=25345839 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
+position = Vector2(1019, 612)
 rotation = -0.49479318
+action_selector = NodePath("ActionSelector_Dealer")
 
-[node name="Player2" parent="Players" unique_id=470449269 instance=ExtResource("7_usajj")]
-position = Vector2(579, 468)
+[node name="ActionSelector_Dealer" type="Node" parent="Players/Player2" unique_id=110230682]
+script = ExtResource("8_xexre")
+metadata/_custom_type_script = "uid://nw2d22w3bo8q"
 
-[node name="Player3" parent="Players" unique_id=1491228057 instance=ExtResource("7_usajj")]
-position = Vector2(430, 438)
+[node name="Player3" parent="Players" unique_id=470449269 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
+position = Vector2(806, 660)
+action_selector = NodePath("ActionSelector_Dealer")
+
+[node name="ActionSelector_Dealer" type="Node" parent="Players/Player3" unique_id=2138261274]
+script = ExtResource("8_xexre")
+metadata/_custom_type_script = "uid://nw2d22w3bo8q"
+
+[node name="Player4" parent="Players" unique_id=1491228057 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
+position = Vector2(594, 612)
 rotation = 0.51088536
+action_selector = NodePath("ActionSelector_Dealer")
 
-[node name="Player4" parent="Players" unique_id=758838861 instance=ExtResource("7_usajj")]
-position = Vector2(306, 351)
+[node name="ActionSelector_Dealer" type="Node" parent="Players/Player4" unique_id=702453168]
+script = ExtResource("8_xexre")
+metadata/_custom_type_script = "uid://nw2d22w3bo8q"
+
+[node name="Player5" parent="Players" unique_id=758838861 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
+position = Vector2(416.00003, 488.00003)
 rotation = 0.83523464
+action_selector = NodePath("ActionSelector_Dealer")
+
+[node name="ActionSelector_Dealer" type="Node" parent="Players/Player5" unique_id=1228058138]
+script = ExtResource("8_xexre")
+metadata/_custom_type_script = "uid://nw2d22w3bo8q"

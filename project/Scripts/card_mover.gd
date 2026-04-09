@@ -6,10 +6,22 @@ class RefInt extends RefCounted:
 class MoveCompleted extends RefCounted:
 	signal finished
 
+static func instance() -> CardMover: return _instance
+static var _instance: CardMover
+
 @export var move_duration: float = 0.3
 
 var _tweens: Dictionary[Card, Tween] = {}
 
+func _ready() -> void:
+	if _instance != null:
+		self.queue_free()
+	else:
+		_instance = self
+
+func _exit_tree() -> void:
+	if _instance == self:
+		_instance = null
 
 func move_card_instant(card: Card, target_pos: Vector2, target_rot: float) -> void:
 	card.global_position = target_pos

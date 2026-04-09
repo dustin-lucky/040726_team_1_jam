@@ -20,6 +20,13 @@ config/icon="res://icon.svg"
 GameRules="*uid://bkaij6apr5x82"
 GlobalSignals="*uid://puh3mlipbbs3"
 
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/size/resizable=false
+window/stretch/mode="canvas_items"
+
 [gui]
 
 theme/custom="uid://bldenm1oj6xkx"
