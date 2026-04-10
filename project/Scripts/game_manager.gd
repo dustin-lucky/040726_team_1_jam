@@ -138,6 +138,7 @@ func handle_player_action(player: Player) -> void:
 			if target_player == null: return
 			
 			if GameRules.is_valid_steal_target_for_player(player, target_player):
+				target_player.play_steal()
 				await game_animator.animate_steal(player.hand, target_player.hand)
 		Hand.Action.GIVE:
 			var target_player: Player = player.action_selector.action.payload.get(&"target_player", null)
@@ -145,3 +146,4 @@ func handle_player_action(player: Player) -> void:
 			
 			if GameRules.is_valid_give_target_for_player(player, target_player):
 				await game_animator.animate_give(player.hand, target_player.hand)
+				target_player.play_give()

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://c00440000002c"]
 
 [ext_resource type="Script" uid="uid://cwl6v7j8ot3c4" path="res://Scripts/card_def.gd" id="1_0044"]
+[ext_resource type="CompressedTexture2D" uid="uid://ck5foixn1lpr4" path="res://Graphics/Sprites/CARDS/Club_6.png" id="2_0044"]
 
 [resource]
 script = ExtResource("1_0044")
@@ -8,3 +9,4 @@ suit = 3
 rank = 6
 value1 = 6
 value2 = 6
+face = ExtResource("2_0044")

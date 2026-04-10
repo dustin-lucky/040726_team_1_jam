@@ -110,8 +110,12 @@ func animate_deal_round_damage(non_dealer_players: Array[Player], players_taking
 		await animate_dealer_look_at(player.hand)
 		if player in players_taking_damage:
 			await get_tree().create_timer(0.3).timeout
-			await animate_dealer_punch(player.hand, func() -> void: player.lives -= 1)
+			await animate_dealer_punch(player.hand, func() -> void:
+				player.lives -= 1
+				player.play_lose()
+			)
 		else:
+			player.play_win()
 			await get_tree().create_timer(0.5).timeout
 
 	var tween := create_tween()

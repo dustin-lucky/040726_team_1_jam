@@ -20,6 +20,12 @@ static var _name_pool: Array[String] = [
 		action_selector = new_value
 		_on_actor_selector_changed()
 
+@export var lose_texture: Texture2D
+@export var win_texture: Texture2D
+@export var steal_texture: Texture2D
+@export var give_texture: Texture2D
+@export var effect_sprite: Sprite2D
+
 var lives: int: 
 	set(new_value):
 		if new_value == lives: return
@@ -29,6 +35,7 @@ var lives: int:
 
 var last_action_taken: ActionSelector.Action
 var user_name: String
+var _effect_tween: Tween = null
 
 
 func _ready() -> void:
@@ -46,6 +53,31 @@ func is_still_in_hand() -> bool:
 	if last_action_taken != null && last_action_taken.chosen_action == Hand.Action.STAND:
 		return false
 	return !GameRules.is_blackjack(hand) && lives > 0
+
+func play_win() -> void: _play_effect(win_texture)
+func play_lose() -> void: _play_effect(lose_texture)
+func play_steal() -> void: _play_effect(steal_texture)
+func play_give() -> void: _play_effect(give_texture)
+
+func _play_effect(texture: Texture2D) -> void:
+	if _effect_tween:
+		_effect_tween.kill()
+	effect_sprite.texture = texture
+	effect_sprite.scale = Vector2.ZERO
+	effect_sprite.rotation = randf_range(-0.2, 0.2)
+	effect_sprite.visible = true
+	_effect_tween = create_tween()
+	# Slam in with overshoot
+	_effect_tween.tween_property(effect_sprite, "scale", Vector2(0.26, 0.26), 0.08).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+	# Settle to final size
+	_effect_tween.tween_property(effect_sprite, "scale", Vector2(0.2, 0.2), 0.1).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	# Hold
+	_effect_tween.tween_interval(0.65)
+	# Wind-up then slam out
+	_effect_tween.tween_property(effect_sprite, "scale", Vector2(0.22, 0.22), 0.05).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	_effect_tween.tween_property(effect_sprite, "scale", Vector2.ZERO, 0.09).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_EXPO)
+	await _effect_tween.finished
+	effect_sprite.visible = false
 
 func _on_action_selector_changing() -> void:
 	if action_selector != null:

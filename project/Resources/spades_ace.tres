@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://c00130000000d"]
 
 [ext_resource type="Script" uid="uid://cwl6v7j8ot3c4" path="res://Scripts/card_def.gd" id="1_0013"]
+[ext_resource type="CompressedTexture2D" uid="uid://1iujd2n2guir" path="res://Graphics/Sprites/CARDS/Spade_A.png" id="2_0013"]
 
 [resource]
 script = ExtResource("1_0013")
@@ -8,3 +9,4 @@ suit = 4
 rank = 1
 value1 = 1
 value2 = 11
+face = ExtResource("2_0013")

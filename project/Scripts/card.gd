@@ -5,7 +5,6 @@ signal dropped(sender: Card)
 
 const FLIP_HALF_DURATION: float = 0.1
 
-@export var card_front: Texture2D
 @export var card_back: Texture2D
 @export var sprite: Sprite2D
 @export var area: Area2D
@@ -65,12 +64,9 @@ func _update_sprite() -> void:
 	if sprite == null:
 		return
 	if face_up and card_def != null:
-		sprite.texture = card_front
-		sprite.region_enabled = true
-		sprite.region_rect = card_def.get_region()
+		sprite.texture = card_def.face
 	else:
 		sprite.texture = card_back
-		sprite.region_enabled = false
 
 func set_rumble(is_on: bool) -> void:
 	if _rumble_tween != null:
