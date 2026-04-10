@@ -5,8 +5,7 @@ extends Node
 @export var deck_count = 1
 @export var blackjack_score: int = 21
 @export var blackjack_card_count: int = 2
-@export var player_damage_multiplier: float = 1.0
-@export var splits_allowed: bool = false
+@export var starting_health: int = 3
 
 
 func is_busted(hand: Hand) -> bool:

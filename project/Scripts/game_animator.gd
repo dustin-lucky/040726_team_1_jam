@@ -77,6 +77,45 @@ func animate_give(giver: Hand, receiver: Hand) -> void:
 	await card_mover.move_card(card, receiver.global_position, receiver.global_rotation)
 	receiver.add_card(card)
 
+## Smoothly rotates the dealer's hand to face [param target_hand].
+func animate_dealer_look_at(target_hand: Hand) -> void:
+	var dealer_hand: Hand = table.get_dealer().hand
+	var direction: Vector2 = target_hand.global_position - dealer_hand.global_position
+	var tween := create_tween()
+	tween.tween_property(dealer_hand, "rotation", direction.angle() - PI / 2.0, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	await tween.finished
+
+## Punches the dealer's hand toward [param target_hand], then returns it to its original position.
+func animate_dealer_punch(target_hand: Hand, on_punch: Callable) -> void:
+	var dealer_hand: Hand = table.get_dealer().hand
+	var original_position: Vector2 = dealer_hand.global_position
+	var punch_position: Vector2 = original_position.lerp(target_hand.global_position, 0.4)
+	var tween := create_tween()
+	tween.tween_property(dealer_hand, "global_position", punch_position, 0.1).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUINT)
+	await tween.finished
+	on_punch.call()
+	tween = create_tween()
+	tween.tween_property(dealer_hand, "global_position", original_position, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	await tween.finished
+
+## Animates the dealer comparing hands and punching players who are taking damage.
+## [param non_dealer_players] is the full list to compare; [param players_taking_damage] is the subset that loses a life.
+func animate_deal_round_damage(non_dealer_players: Array[Player], players_taking_damage: Array[Player]) -> void:
+	var dealer_hand: Hand = table.get_dealer().hand
+	var original_rotation: float = dealer_hand.rotation
+
+	for player: Player in non_dealer_players:
+		await animate_dealer_look_at(player.hand)
+		if player in players_taking_damage:
+			await get_tree().create_timer(0.3).timeout
+			await animate_dealer_punch(player.hand, func() -> void: player.lives -= 1)
+		else:
+			await get_tree().create_timer(0.5).timeout
+
+	var tween := create_tween()
+	tween.tween_property(dealer_hand, "rotation", original_rotation, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	await tween.finished
+
 ## Animates [param stealer] taking [param target]'s leftmost card into their own hand.
 func animate_steal(stealer: Hand, target: Hand) -> void:
 	if target.cards.is_empty():

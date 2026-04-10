@@ -12,7 +12,9 @@ func _ready() -> void:
 
 func game_loop() -> void:
 	await game_animator.shuffle_discard_into_shoe()
-	while true:
+	for player: Player in table.players:
+		player.lives = GameRules.starting_health
+	while get_alive_player_count() > 0:
 		await game_animator.do_initial_deal()
 		
 		clear_previous_actions()
@@ -20,7 +22,7 @@ func game_loop() -> void:
 			for player in table.players:
 				if player == table.get_dealer():
 					continue
-				
+		
 				if !player.is_still_in_hand():
 					continue
 				player.action_selector.request_make_action(table.players)
@@ -28,13 +30,23 @@ func game_loop() -> void:
 				await handle_player_action(player)
 		
 		await table.get_dealer().hand.cards[1].flip()
-		
+		table.get_dealer().hand.recalculate_score()
 		while table.get_dealer().is_still_in_hand():
 			await table.get_dealer().action_selector.request_make_action(table.players)
 			await handle_player_action(table.get_dealer())
 		
+		await deal_round_damage()
 		await get_tree().create_timer(2.0).timeout
 		await game_animator.clean_up_round()
+
+func get_alive_player_count() -> int:
+	var count := 0
+	for player in table.players:
+		if player == table.get_dealer():
+			continue
+		if player.lives > 0:
+			count += 1
+	return count
 
 func non_dealer_players_still_in_hand() -> bool:
 	for player in table.players:
@@ -47,6 +59,23 @@ func non_dealer_players_still_in_hand() -> bool:
 func clear_previous_actions() -> void:
 	for player in table.players:
 		player.last_action_taken = null
+
+func deal_round_damage() -> void:
+	var dealer := table.get_dealer()
+	if GameRules.is_busted(dealer.hand):
+		return
+
+	var dealer_score := dealer.hand.current_score
+	var non_dealer_players: Array[Player] = []
+	var players_taking_damage: Array[Player] = []
+	for player: Player in table.players:
+		if player == dealer or player.lives <= 0:
+			continue
+		non_dealer_players.append(player)
+		if GameRules.is_busted(player.hand) or player.hand.current_score < dealer_score:
+			players_taking_damage.append(player)
+	# Players take damage as part of the animation loop
+	await game_animator.animate_deal_round_damage(non_dealer_players, players_taking_damage)
 
 func handle_player_action(player: Player) -> void:
 	match player.action_selector.action.chosen_action:

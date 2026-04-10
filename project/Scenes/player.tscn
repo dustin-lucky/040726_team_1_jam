@@ -14,7 +14,7 @@ metadata/_custom_type_script = "uid://duhpidrwqq48n"
 script = ExtResource("2_cvnsp")
 metadata/_custom_type_script = "uid://cqycmtekgabtn"
 
-[node name="PlayerUI" type="Control" parent="." unique_id=2060868973 node_paths=PackedStringArray("player", "score_label", "name_label")]
+[node name="PlayerUI" type="Control" parent="." unique_id=2060868973 node_paths=PackedStringArray("player", "score_label", "name_label", "lives_label")]
 layout_mode = 3
 anchors_preset = 0
 offset_left = -113.0
@@ -25,6 +25,7 @@ script = ExtResource("3_6t5aa")
 player = NodePath("..")
 score_label = NodePath("Score Label")
 name_label = NodePath("Name Label")
+lives_label = NodePath("Health Label")
 metadata/_custom_type_script = "uid://bito4sin4rnnq"
 
 [node name="Score Label" type="RichTextLabel" parent="PlayerUI" unique_id=970840483]
@@ -47,6 +48,23 @@ grow_horizontal = 2
 grow_vertical = 0
 theme = ExtResource("4_vgqql")
 theme_override_colors/default_color = Color(0.9264804, 0.80905277, 0.13330224, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/normal_font_size = 20
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Health Label" type="RichTextLabel" parent="PlayerUI" unique_id=125995791]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+offset_bottom = 21.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("4_vgqql")
+theme_override_colors/default_color = Color(0.8858473, 0, 0.18063942, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/normal_font_size = 20
 fit_content = true
