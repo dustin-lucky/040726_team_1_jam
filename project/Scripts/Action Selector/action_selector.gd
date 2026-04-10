@@ -1,13 +1,8 @@
 ## Handles choosing player actions.
 @abstract class_name ActionSelector extends Node
 
-enum ActionTypes {
-	STAND,
-	HIT
-}
-
 class Action extends RefCounted:
-	var chosen_action: ActionTypes = ActionTypes.STAND
+	var chosen_action: Hand.Action = Hand.Action.STAND
 	var payload: Dictionary[StringName, Variant] = {}
 
 @warning_ignore("unused_signal")

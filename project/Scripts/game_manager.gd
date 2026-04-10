@@ -48,7 +48,19 @@ func clear_previous_actions() -> void:
 
 func handle_player_action(player: Player) -> void:
 	match player.action_selector.action.chosen_action:
-		ActionSelector.ActionTypes.HIT:
+		Hand.Action.HIT:
 			await game_animator.deal_card_to_player(player)
-		ActionSelector.ActionTypes.STAND:
+		Hand.Action.STAND:
 			return
+		Hand.Action.STEAL:
+			var target_player: Player = player.action_selector.action.payload.get(&"target_player", null)
+			if target_player == null: return
+			
+			if GameRules.is_valid_steal_target_for_player(player, target_player):
+				await game_animator.animate_steal(player.hand, target_player.hand)
+		Hand.Action.GIVE:
+			var target_player: Player = player.action_selector.action.payload.get(&"target_player", null)
+			if target_player == null: return
+			
+			if GameRules.is_valid_give_target_for_player(player, target_player):
+				await game_animator.animate_give(player.hand, target_player.hand)

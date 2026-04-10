@@ -55,9 +55,39 @@ func do_initial_deal() -> void:
 func deal_card_to_player(player: Player, face_up = true) -> void:
 	if table.shoe.count() <= 0:
 		await shuffle_discard_into_shoe()
-	
+
 	var card: Card = table.shoe.draw()
 	card.face_up = face_up
-	
+
 	await card_mover.move_card(card, player.hand.global_position, player.hand.global_rotation)
 	player.hand.add_card(card)
+
+## Animates [param giver]'s rightmost card moving to [param receiver]'s hand.
+func animate_give(giver: Hand, receiver: Hand) -> void:
+	if giver.cards.is_empty():
+		return
+	
+	var card_index: int = GameRules.get_give_card_index(giver)
+	if card_index < 0: 
+		return
+	
+	var card: Card = giver.cards[card_index]
+	giver.remove_card(card)
+	
+	await card_mover.move_card(card, receiver.global_position, receiver.global_rotation)
+	receiver.add_card(card)
+
+## Animates [param stealer] taking [param target]'s leftmost card into their own hand.
+func animate_steal(stealer: Hand, target: Hand) -> void:
+	if target.cards.is_empty():
+		return
+	
+	var card_index: int = GameRules.get_steal_card_index(target)
+	if card_index < 0: 
+		return
+	
+	var card: Card = target.cards[card_index]
+	target.remove_card(card)
+	
+	await card_mover.move_card(card, stealer.global_position, stealer.global_rotation)
+	stealer.add_card(card)

@@ -7,8 +7,8 @@ enum Action {
 	NONE = 0,
 	HIT = 1,
 	STAND = 2,
-	DOUBLE_DOWN = 4,
-	SPLIT = 8,
+	STEAL = 4,
+	GIVE = 8
 }
 
 var id: int
@@ -65,24 +65,25 @@ func clear() -> Array[Card]:
 
 func get_available_action_count() -> int:
 	var count := 0
-	for action in [Action.HIT, Action.STAND, Action.DOUBLE_DOWN, Action.SPLIT]:
+	for action in [Action.HIT, Action.STAND, Action.STEAL, Action.GIVE]:
 		if available_actions & action:
 			count += 1
 	return count
 
 
 func get_available_actions() -> Action:
-	var actions := Action.STAND
+	if GameRules.is_blackjack(self):
+		return Action.STAND
+	
+	var actions := Action.STAND | Action.STEAL
+	
 	if current_score < GameRules.blackjack_score:
-		@warning_ignore("int_as_enum_without_cast")
 		actions |= Action.HIT
-	if cards.size() == 2 and current_score < GameRules.blackjack_score:
-		@warning_ignore("int_as_enum_without_cast")
-		actions |= Action.DOUBLE_DOWN
-	if GameRules.splits_allowed and cards.size() == 2 and cards[0].value1_override == cards[1].value1_override and cards[0].value2_override == cards[1].value2_override:
-		@warning_ignore("int_as_enum_without_cast")
-		actions |= Action.SPLIT
-	return actions
+	
+	if GameRules.hand_can_give(self):
+		actions |= Action.GIVE
+	
+	return actions as Action
 
 
 func reposition_cards() -> void:
