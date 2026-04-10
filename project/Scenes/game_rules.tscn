@@ -4,3 +4,4 @@
 
 [node name="GameRules" type="Node" unique_id=1781910006]
 script = ExtResource("1_ksjgk")
+starting_health = 1

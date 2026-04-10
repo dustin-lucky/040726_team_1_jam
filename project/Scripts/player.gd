@@ -30,6 +30,7 @@ var lives: int:
 var last_action_taken: ActionSelector.Action
 var user_name: String
 
+
 func _ready() -> void:
 	if _name_pool.size() > 0:
 		var idx := randi() % _name_pool.size()
