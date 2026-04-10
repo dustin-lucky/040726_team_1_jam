@@ -46,6 +46,8 @@ func do_initial_deal() -> void:
 	
 	for i: int in num_cards_to_deal:
 		for player: Player in deal_order:
+			if player.lives <= 0:
+				continue
 			var face_up: bool = false
 			if player != table.get_dealer() || i == 0:
 				face_up = true

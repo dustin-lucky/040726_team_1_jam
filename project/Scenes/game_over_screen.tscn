@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://dde811v2hl31u"]
+
+[ext_resource type="Script" uid="uid://cwbu86gmo3afi" path="res://Scripts/game_over_screen.gd" id="1_0gua7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_overlay"]
+bg_color = Color(0, 0, 0, 0.8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.06, 0.22, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.8, 0.68, 0.1, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 48.0
+content_margin_top = 48.0
+content_margin_right = 48.0
+content_margin_bottom = 48.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_separator"]
+bg_color = Color(0.8, 0.68, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.8, 0.68, 0.1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.95, 0.82, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.6, 0.5, 0.05, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[node name="GameOverScreen" type="CanvasLayer" unique_id=1558991329 node_paths=PackedStringArray("winners_label", "winnings_label", "play_again_button")]
+script = ExtResource("1_0gua7")
+winners_label = NodePath("Panel/CenterContainer/PanelContainer/VBox/WinnersLabel")
+winnings_label = NodePath("Panel/CenterContainer/PanelContainer/VBox/WinningsLabel")
+play_again_button = NodePath("Panel/CenterContainer/PanelContainer/VBox/PlayAgainButton")
+metadata/_custom_type_script = "uid://cwbu86gmo3afi"
+
+[node name="Panel" type="Panel" parent="." unique_id=367160053]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_overlay")
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel" unique_id=284756102]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Panel/CenterContainer" unique_id=192384756]
+layout_mode = 2
+custom_minimum_size = Vector2(540, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/CenterContainer/PanelContainer" unique_id=847291038]
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="TitleLabel" type="RichTextLabel" parent="Panel/CenterContainer/PanelContainer/VBox" unique_id=374829103]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 60
+theme_override_font_sizes/bold_font_size = 60
+theme_override_colors/default_color = Color(1, 0.85, 0.1, 1)
+bbcode_enabled = true
+text = "[center][b]GAME OVER[/b][/center]"
+fit_content = true
+scroll_active = false
+
+[node name="HSeparator" type="HSeparator" parent="Panel/CenterContainer/PanelContainer/VBox" unique_id=928374650]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
+theme_override_constants/separation = 4
+
+[node name="WinnersLabel" type="RichTextLabel" parent="Panel/CenterContainer/PanelContainer/VBox" unique_id=192837465]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 34
+theme_override_font_sizes/bold_font_size = 34
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+bbcode_enabled = true
+text = "[center]...[/center]"
+fit_content = true
+scroll_active = false
+
+[node name="WinningsLabel" type="RichTextLabel" parent="Panel/CenterContainer/PanelContainer/VBox" unique_id=837465192]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 26
+theme_override_font_sizes/bold_font_size = 26
+theme_override_colors/default_color = Color(0.55, 0.95, 0.55, 1)
+bbcode_enabled = true
+text = "[center]Takes home [b]$0[/b][/center]"
+fit_content = true
+scroll_active = false
+
+[node name="Spacer" type="Control" parent="Panel/CenterContainer/PanelContainer/VBox" unique_id=746519283]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 12)
+
+[node name="PlayAgainButton" type="Button" parent="Panel/CenterContainer/PanelContainer/VBox" unique_id=938471625]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 56)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.1, 0.07, 0, 1)
+theme_override_colors/font_hover_color = Color(0.05, 0.03, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.07, 0, 1)
+text = "Play Again"
