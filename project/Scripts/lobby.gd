@@ -27,8 +27,7 @@ var _selected_code := ""
 
 func _ready() -> void:
 	name_input.text = PLAYER_NAMES[randi() % PLAYER_NAMES.size()]
-	create_button.disabled = true
-	join_button.disabled = true
+	join_button.disabled = true  # enabled once a game is selected
 	_ws.connect_to_url(LOBBY_URL)
 
 
@@ -68,7 +67,7 @@ func _handle_message(text: String) -> void:
 func _add_game_row(code: String, host_name: String, player_count: int) -> void:
 	var row_name := "game_" + code
 	if games_list.find_child(row_name, false, false):
-		return  # already listed
+		return
 
 	var btn := Button.new()
 	btn.name = row_name
@@ -80,7 +79,6 @@ func _add_game_row(code: String, host_name: String, player_count: int) -> void:
 
 	no_games_label.visible = false
 
-	# Auto-select if nothing is selected yet
 	if _selected_code.is_empty():
 		_on_row_selected(code)
 
@@ -105,11 +103,9 @@ func _remove_game_row(code: String) -> void:
 func _on_row_selected(code: String) -> void:
 	_selected_code = code
 	join_button.disabled = false
-	# Highlight selected row, un-highlight others
 	for child in games_list.get_children():
 		if child is Button:
-			var is_selected := child.name == "game_" + code
-			child.modulate = Color(1.4, 1.4, 0.6) if is_selected else Color.WHITE
+			child.modulate = Color(1.4, 1.4, 0.6) if child.name == "game_" + code else Color.WHITE
 
 
 func _refresh_no_games_label() -> void:
@@ -126,8 +122,7 @@ func _auto_select_first() -> void:
 		return
 	for child in games_list.get_children():
 		if child.name.begins_with("game_"):
-			var code := child.name.trim_prefix("game_")
-			_on_row_selected(code)
+			_on_row_selected(child.name.trim_prefix("game_"))
 			break
 
 
@@ -140,21 +135,35 @@ func _on_play_local_pressed() -> void:
 
 
 func _on_create_game_pressed() -> void:
-	if not _connected:
-		return
-	var host_name := name_input.text.strip_edges()
-	if host_name.is_empty():
-		host_name = PLAYER_NAMES[randi() % PLAYER_NAMES.size()]
-
+	var host_name := _get_name()
 	_room_code = _generate_code()
-	_ws.send_text(JSON.stringify({
-		"type": "register_game",
-		"code": _room_code,
-		"host_name": host_name,
-	}))
+
+	# Register with lobby so others can see the game (best-effort — fine if not yet connected)
+	if _connected:
+		_ws.send_text(JSON.stringify({
+			"type": "register_game",
+			"code": _room_code,
+			"host_name": host_name,
+		}))
 
 	create_button.text = "Game Created!  (code: %s)" % _room_code
 	create_button.disabled = true
+
+	# Add a Start Game button below the create button
+	var start_btn := Button.new()
+	start_btn.name = "StartGameButton"
+	start_btn.text = "▶  Start Game"
+	start_btn.theme_override_font_sizes["font_size"] = 22
+	start_btn.pressed.connect(_on_start_game_pressed)
+	var vbox := $CenterContainer/VBoxContainer as VBoxContainer
+	vbox.add_child(start_btn)
+	vbox.move_child(start_btn, create_button.get_index() + 1)
+
+
+func _on_start_game_pressed() -> void:
+	NetworkManager.setup_host(_room_code, _get_name())
+	NetworkManager.game_room_ready.connect(_on_game_room_ready, CONNECT_ONE_SHOT)
+	NetworkManager.connect_to_game_room()
 
 
 func _on_join_game_pressed() -> void:
@@ -164,7 +173,18 @@ func _on_join_game_pressed() -> void:
 		"type": "join_game",
 		"code": _selected_code,
 	}))
+	NetworkManager.setup_client(_selected_code, _get_name())
+	NetworkManager.game_room_ready.connect(_on_game_room_ready, CONNECT_ONE_SHOT)
+	NetworkManager.connect_to_game_room()
+
+
+func _on_game_room_ready() -> void:
 	get_tree().change_scene_to_file("res://Scenes/game_scene.tscn")
+
+
+func _get_name() -> String:
+	var n := name_input.text.strip_edges()
+	return n if not n.is_empty() else PLAYER_NAMES[randi() % PLAYER_NAMES.size()]
 
 
 func _generate_code() -> String:

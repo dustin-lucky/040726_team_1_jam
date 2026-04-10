@@ -4,6 +4,8 @@ class_name GameStateManager extends Node
 @export var game_animator: GameAnimator
 
 func _ready() -> void:
+	if NetworkManager.is_multiplayer:
+		return  # multiplayer: game loop held until a later phase
 	table.populate_decks()
 	game_loop()
 
