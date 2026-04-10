@@ -169,7 +169,8 @@ func _on_start_game_pressed() -> void:
 
 func _on_host_game_room_ready() -> void:
 	# Broadcast start_game to all clients then enter the game ourselves
-	NetworkManager.send({"type": "start_game"})
+	NetworkManager.assign_session_seed_for_new_game()
+	NetworkManager.send({"type": "start_game", "rng_seed": NetworkManager.session_seed})
 	get_tree().change_scene_to_file("res://Scenes/game_scene.tscn")
 
 

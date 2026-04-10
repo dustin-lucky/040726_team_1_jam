@@ -9,7 +9,9 @@ var pot: int = 2500
 
 func _ready() -> void:
 	if NetworkManager.is_multiplayer:
-		return  # multiplayer: game loop held until a later phase
+		await get_tree().process_frame
+		if NetworkManager.session_seed != -1:
+			seed(NetworkManager.session_seed)
 	table.populate_decks()
 	game_loop()
 
@@ -17,9 +19,15 @@ func _ready() -> void:
 func game_loop() -> void:
 	await game_animator.shuffle_discard_into_shoe()
 	for player: Player in table.players:
+		if player == table.get_dealer():
+			player.lives = GameRules.starting_health
+			continue
+		if NetworkManager.is_multiplayer and not NetworkManager.is_table_slot_occupied(table.players.find(player)):
+			player.lives = 0
+			continue
 		player.lives = GameRules.starting_health
 	var last_alive_players: Array[Player] = []
-	while get_alive_player_count() > 1:
+	while _match_should_continue():
 		last_alive_players.clear()
 		for player: Player in table.players:
 			if player == table.get_dealer():
@@ -36,7 +44,14 @@ func game_loop() -> void:
 		
 				if !player.is_still_in_hand():
 					continue
-				player.action_selector.request_make_action(table.players)
+				# Multiplayer: must await so the async setup (timer + network listener + LocalUI)
+				# runs to completion on web; fire-and-forget can strand the coroutine. Single-player
+				# must NOT await here: AI selectors emit action_ready inside _on_action_requested, so
+				# awaiting request_make_action would finish after the signal and the next line would hang.
+				if NetworkManager.is_multiplayer:
+					await player.action_selector.request_make_action(table.players)
+				else:
+					player.action_selector.request_make_action(table.players)
 				await player.action_selector.action_ready
 				await handle_player_action(player)
 		
@@ -59,8 +74,19 @@ func game_loop() -> void:
 				var winners: Array[Player] = [player]
 				on_game_over.emit(winners, pot)
 				return
-	else:
+	elif last_alive_players.size() > 0:
 		on_game_over.emit(last_alive_players, pot / last_alive_players.size())
+	else:
+		on_game_over.emit([], 0)
+
+
+func _match_should_continue() -> bool:
+	var alive := get_alive_player_count()
+	if NetworkManager.is_multiplayer:
+		if NetworkManager.multiplayer_connected_human_count() <= 1:
+			return alive > 0
+		return alive > 1
+	return alive > 1
 
 
 func get_alive_player_count() -> int:

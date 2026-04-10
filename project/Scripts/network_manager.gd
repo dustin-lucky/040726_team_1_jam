@@ -9,6 +9,9 @@ var room_code: String = ""
 var my_name: String = ""
 var my_peer_id: int = -1
 
+# Synced RNG for identical shuffle/deals across peers (-1 = not set / local game).
+var session_seed: int = -1
+
 # Array of {peer_id: int, name: String, player_index: int}
 var players: Array[Dictionary] = []
 
@@ -16,6 +19,8 @@ signal player_joined(peer_id: int, player_name: String, player_index: int)
 signal player_left(peer_id: int, player_index: int)
 signal game_room_ready()
 signal game_started()
+## from_peer matches PartyKit relay "from" (sender peer id). target_player_index is table index or -1.
+signal player_action_received(from_peer: int, player_index: int, action_key: String, target_player_index: int)
 
 var _ws := WebSocketPeer.new()
 var _ready_emitted := false
@@ -35,6 +40,7 @@ func setup_host(code: String, host_name: String) -> void:
 	_ready_emitted = false
 	_client_accepts_start_game = false
 	_pending_client_start_game = false
+	session_seed = -1
 
 
 func setup_client(code: String, client_name: String) -> void:
@@ -46,6 +52,69 @@ func setup_client(code: String, client_name: String) -> void:
 	_ready_emitted = false
 	_client_accepts_start_game = false
 	_pending_client_start_game = false
+	session_seed = -1
+
+
+func assign_session_seed_for_new_game() -> void:
+	session_seed = randi()
+
+
+func get_my_player_index() -> int:
+	if my_peer_id <= 0:
+		return -1
+	# Prefer roster from "joined" / "player_joined" (handles JSON number quirks and future id schemes).
+	for p in players:
+		var roster_pid: int = int(p.get("peer_id", -9999))
+		if roster_pid == my_peer_id:
+			return int(p.get("player_index", -1))
+	# Relay should always include us; keep PartyKit fallback (peer id 1..n → seat 0..n-1).
+	return my_peer_id - 1
+
+
+func is_table_slot_occupied(slot_index: int) -> bool:
+	if slot_index < 0:
+		return false
+	for p in players:
+		if int(p.get("player_index", -9999)) == slot_index:
+			return true
+	return false
+
+
+func multiplayer_connected_human_count() -> int:
+	return players.size()
+
+
+## Serialize current [member ActionSelector.action] and send; relay does not echo back to sender, so we dispatch locally too.
+func send_player_action_from_ui(sel: ActionSelector) -> void:
+	if not is_multiplayer:
+		return
+	var action_key := _hand_action_to_key(sel.action.chosen_action)
+	var tgt_idx := -1
+	var tp: Variant = sel.action.payload.get(&"target_player", null)
+	if tp is Player:
+		var p := tp as Player
+		if p.action_selector != null:
+			tgt_idx = p.action_selector.my_player_index
+	var idx := sel.my_player_index
+	var msg := {"type": "player_action", "player_index": idx, "action": action_key}
+	if tgt_idx >= 0:
+		msg["target_player_index"] = tgt_idx
+	send(msg)
+	player_action_received.emit(my_peer_id, idx, action_key, tgt_idx)
+
+
+func _hand_action_to_key(a: Hand.Action) -> String:
+	match a:
+		Hand.Action.HIT:
+			return "hit"
+		Hand.Action.STAND:
+			return "stand"
+		Hand.Action.STEAL:
+			return "steal"
+		Hand.Action.GIVE:
+			return "give"
+		_:
+			return "stand"
 
 
 func mark_client_ready_to_receive_start_game() -> void:
@@ -81,37 +150,43 @@ func _handle_message(text: String) -> void:
 	var data: Variant = JSON.parse_string(text)
 	if not data is Dictionary:
 		return
-	match data.get("type", ""):
+	var msg_type: String = str(data.get("type", ""))
+	match msg_type:
 		"joined":
-			my_peer_id = int(data["peer_id"])
+			my_peer_id = int(data.get("peer_id", -1))
 			players.clear()
 			for p in data.get("players", []):
+				if not p is Dictionary:
+					continue
+				var pd: Dictionary = p as Dictionary
 				players.append({
-					"peer_id": int(p["peer_id"]),
-					"name": str(p["name"]),
-					"player_index": int(p["player_index"]),
+					"peer_id": int(pd.get("peer_id", -1)),
+					"name": str(pd.get("name", "")),
+					"player_index": int(pd.get("player_index", -1)),
 				})
 			if not _ready_emitted:
 				_ready_emitted = true
 				game_room_ready.emit()
 		"player_joined":
 			var entry := {
-				"peer_id": int(data["peer_id"]),
-				"name": str(data["name"]),
-				"player_index": int(data["player_index"]),
+				"peer_id": int(data.get("peer_id", -1)),
+				"name": str(data.get("name", "")),
+				"player_index": int(data.get("player_index", -1)),
 			}
 			players.append(entry)
 			player_joined.emit(entry["peer_id"], entry["name"], entry["player_index"])
 		"peer_left":
-			var pid := int(data["peer_id"])
+			var pid := int(data.get("peer_id", -1))
 			var left_index := -1
 			for p in players:
-				if p["peer_id"] == pid:
-					left_index = p["player_index"]
+				if int(p.get("peer_id", -9999)) == pid:
+					left_index = int(p.get("player_index", -1))
 					break
-			players = players.filter(func(p: Dictionary) -> bool: return p["peer_id"] != pid)
+			players = players.filter(func(p: Dictionary) -> bool: return int(p.get("peer_id", -9999)) != pid)
 			player_left.emit(pid, left_index)
 		"start_game":
+			if data.has("rng_seed"):
+				session_seed = int(data.get("rng_seed", -1))
 			# Host never receives their own relayed start_game; ignore if we did.
 			if is_host:
 				return
@@ -119,10 +194,16 @@ func _handle_message(text: String) -> void:
 				_pending_client_start_game = true
 				return
 			game_started.emit()
+		"player_action":
+			var from_peer := int(data.get("from", -1))
+			var p_idx := int(data.get("player_index", -1))
+			var act := str(data.get("action", "stand"))
+			var tgt := int(data.get("target_player_index", -1))
+			player_action_received.emit(from_peer, p_idx, act, tgt)
 
 
 func get_player_name(player_index: int) -> String:
 	for p in players:
-		if p["player_index"] == player_index:
-			return p["name"]
+		if int(p.get("player_index", -9999)) == player_index:
+			return str(p.get("name", ""))
 	return ""

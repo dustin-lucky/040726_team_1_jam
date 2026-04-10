@@ -11,7 +11,9 @@ func _ready() -> void:
 
 
 func show_game_over(winners: Array[Player], winnings: int) -> void:
-	if winners.size() == 1:
+	if winners.is_empty():
+		winners_label.text = "[center]Game over[/center]"
+	elif winners.size() == 1:
 		winners_label.text = "[center][b]%s[/b]\nwins![/center]" % winners[0].user_name
 	else:
 		var lines: Array[String] = []

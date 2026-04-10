@@ -3,15 +3,14 @@ extends Node
 # Hides all player slots on load, then reveals them as players connect.
 # Name labels are added below each player's UI panel.
 
+const _NETWORKED_SELECTOR := preload("res://Scripts/Action Selector/action_selector_networked.gd")
+
 @onready var _table: Table = $"../Table"
 
 
 func _ready() -> void:
 	if not NetworkManager.is_multiplayer:
 		return
-
-	if NetworkManager.is_host:
-		_add_host_admit_lobby_button()
 
 	# Hide every non-dealer slot to start with an empty table
 	for i in range(_table.players.size() - 1):
@@ -21,17 +20,38 @@ func _ready() -> void:
 	for p in NetworkManager.players:
 		_show_player(p["player_index"], p["name"])
 
+	_configure_multiplayer_action_selectors()
+
 	NetworkManager.player_joined.connect(_on_player_joined)
 	NetworkManager.player_left.connect(_on_player_left)
 
 
 func _on_player_joined(_peer_id: int, player_name: String, player_index: int) -> void:
 	_show_player(player_index, player_name)
+	_swap_selector_to_networked(_table.players[player_index], player_index)
 
 
 func _on_player_left(_peer_id: int, player_index: int) -> void:
 	if player_index >= 0 and player_index < _table.players.size() - 1:
-		_table.players[player_index].visible = false
+		var pl := _table.players[player_index]
+		pl.visible = false
+		pl.lives = 0
+
+
+func _configure_multiplayer_action_selectors() -> void:
+	for i in range(_table.players.size() - 1):
+		var pl := _table.players[i]
+		if NetworkManager.is_table_slot_occupied(i):
+			_swap_selector_to_networked(pl, i)
+		else:
+			pl.lives = 0
+
+
+func _swap_selector_to_networked(pl: Player, table_index: int) -> void:
+	var new_sel: ActionSelector = _NETWORKED_SELECTOR.new() as ActionSelector
+	new_sel.name = "ActionSelector_Networked"
+	pl.action_selector = new_sel
+	pl.action_selector.my_player_index = table_index
 
 
 func _show_player(player_index: int, player_name: String) -> void:
@@ -40,21 +60,6 @@ func _show_player(player_index: int, player_name: String) -> void:
 	var player := _table.players[player_index]
 	player.visible = true
 	_set_name_label(player, player_name)
-
-
-func _add_host_admit_lobby_button() -> void:
-	# Late joiners wait in lobby until they receive start_game; host already sent once
-	# before entering — use this to relay start_game again when new players are waiting.
-	var layer := CanvasLayer.new()
-	layer.name = "HostAdmitLobbyLayer"
-	var btn := Button.new()
-	btn.text = "Admit waiting lobby players"
-	btn.position = Vector2(16, 16)
-	btn.pressed.connect(func() -> void:
-		NetworkManager.send({"type": "start_game"})
-	)
-	layer.add_child(btn)
-	add_child(layer)
 
 
 func _set_name_label(player: Player, player_name: String) -> void:
