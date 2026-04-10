@@ -1,0 +1,5 @@
+{
+  "name": "bj-relay",
+  "main": "src/index.ts",
+  "compatibilityDate": "2026-04-10"
+}

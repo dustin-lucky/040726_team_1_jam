@@ -90,6 +90,10 @@ func _on_actor_selector_changed() -> void:
 	if action_selector != null:
 		action_selector.action_ready.connect(_on_action_selected)
 		if action_selector.get_parent() != self:
-			action_selector.reparent(self)
+			# .new() selectors have no parent — reparent() requires one; add_child is correct.
+			if action_selector.get_parent() == null:
+				add_child(action_selector)
+			else:
+				action_selector.reparent(self)
 	
 	action_selector_changed.emit(self)

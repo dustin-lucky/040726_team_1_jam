@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Competitive Blackjack"
-run/main_scene="uid://bkf2mdh6xporu"
+run/main_scene="res://Scenes/lobby.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameRules="*uid://bkaij6apr5x82"
 GlobalSignals="*uid://puh3mlipbbs3"
 LocalUI="*uid://6sk75a564j7p"
+NetworkManager="*res://Scripts/network_manager.gd"
 
 [display]
 

@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://dxhksohvi0aiq"]
+
+[ext_resource type="Script" path="res://Scripts/lobby.gd" id="1_lobby"]
+[ext_resource type="Theme" uid="uid://bldenm1oj6xkx" path="res://Graphics/UI Themes/game_theme.tres" id="2_lobby"]
+
+[node name="Lobby" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("2_lobby")
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07, 0.22, 0.07, 1.0)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(520, 0)
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "COMPETITIVE BLACKJACK"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 42
+
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 16)
+
+[node name="NameRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="CenterContainer/VBoxContainer/NameRow"]
+layout_mode = 2
+text = "Your name:"
+vertical_alignment = 1
+
+[node name="NameInput" type="LineEdit" parent="CenterContainer/VBoxContainer/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter your name"
+theme_override_font_sizes/font_size = 18
+
+[node name="Spacer2" type="Control" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+
+[node name="PlayLocalButton" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Play Local Game"
+theme_override_font_sizes/font_size = 22
+
+[node name="CreateGameButton" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Create Multiplayer Game"
+disabled = true
+theme_override_font_sizes/font_size = 22
+
+[node name="JoinGameButton" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Join Multiplayer Game"
+disabled = true
+theme_override_font_sizes/font_size = 22
+
+[node name="Spacer3" type="Control" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+
+[node name="GamesListLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Open Multiplayer Games"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="GamesListPanel" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(520, 180)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer/GamesListPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GamesList" type="VBoxContainer" parent="CenterContainer/VBoxContainer/GamesListPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="NoGamesLabel" type="Label" parent="CenterContainer/VBoxContainer/GamesListPanel/ScrollContainer/GamesList"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "No open games — be the first to create one!"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/PlayLocalButton" to="." method="_on_play_local_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/CreateGameButton" to="." method="_on_create_game_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/JoinGameButton" to="." method="_on_join_game_pressed"]
