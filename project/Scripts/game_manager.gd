@@ -1,5 +1,9 @@
 class_name GameStateManager extends Node
 
+signal on_game_over(winners: Array[Player], winnings: int)
+
+var pot: int = 2500
+
 @export var table: Table
 @export var game_animator: GameAnimator
 
@@ -14,7 +18,14 @@ func game_loop() -> void:
 	await game_animator.shuffle_discard_into_shoe()
 	for player: Player in table.players:
 		player.lives = GameRules.starting_health
-	while get_alive_player_count() > 0:
+	var last_alive_players: Array[Player] = []
+	while get_alive_player_count() > 1:
+		last_alive_players.clear()
+		for player: Player in table.players:
+			if player == table.get_dealer():
+				continue
+			if player.lives > 0:
+				last_alive_players.append(player)
 		await game_animator.do_initial_deal()
 		
 		clear_previous_actions()
@@ -38,6 +49,19 @@ func game_loop() -> void:
 		await deal_round_damage()
 		await get_tree().create_timer(2.0).timeout
 		await game_animator.clean_up_round()
+
+	var alive_count := get_alive_player_count()
+	if alive_count == 1:
+		for player: Player in table.players:
+			if player == table.get_dealer():
+				continue
+			if player.lives > 0:
+				var winners: Array[Player] = [player]
+				on_game_over.emit(winners, pot)
+				return
+	else:
+		on_game_over.emit(last_alive_players, pot / last_alive_players.size())
+
 
 func get_alive_player_count() -> int:
 	var count := 0
