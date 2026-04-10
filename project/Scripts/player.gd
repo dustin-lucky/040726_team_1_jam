@@ -3,6 +3,14 @@ class_name Player extends Node2D
 signal action_selector_changing(sender: Player)
 signal action_selector_changed(sender: Player)
 
+static var _name_pool: Array[String] = [
+	"Ace McGee", "Busted Bart", "Lucky Lou", "Double Down Dana",
+	"Shufflin' Sam", "Card Shark Carla", "High Roller Hank", "Split Pete",
+	"Dealer's Bane", "Soft Seventeen Sue", "Blackjack Betty", "Bust-Out Bob",
+	"Counting Carl", "Insurance Ivan", "Hit Me Harry", "Stand Pat Patty",
+	"Risky Rita", "Natural Nina", "Shoe Shaker Shawn", "All-In Al"
+]
+
 @export var hand: Hand
 @export var action_selector: ActionSelector:
 	set(new_value):
@@ -12,6 +20,13 @@ signal action_selector_changed(sender: Player)
 		_on_actor_selector_changed()
 
 var last_action_taken: ActionSelector.Action
+var user_name: String
+
+func _ready() -> void:
+	if _name_pool.size() > 0:
+		var idx := randi() % _name_pool.size()
+		user_name = _name_pool[idx]
+		_name_pool.remove_at(idx)
 
 func is_dealer() -> bool: return false
 

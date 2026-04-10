@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://6sk75a564j7p"]
+
+[ext_resource type="Script" uid="uid://c4elqh78yqv4s" path="res://Scripts/local_player_ui.gd" id="1_wg8jb"]
+[ext_resource type="Theme" uid="uid://bldenm1oj6xkx" path="res://Graphics/UI Themes/game_theme.tres" id="2_gwgup"]
+
+[node name="CanvasLayer" type="CanvasLayer" unique_id=605253831 node_paths=PackedStringArray("hit_button", "stand_button", "steal_button", "give_button", "player_buttons_root", "player_buttons")]
+script = ExtResource("1_wg8jb")
+hit_button = NodePath("LocalPlayerUI/ActionButtons/ActionButton_Hit")
+stand_button = NodePath("LocalPlayerUI/ActionButtons/ActionButton_Stand")
+steal_button = NodePath("LocalPlayerUI/ActionButtons/ActionButton_Steal")
+give_button = NodePath("LocalPlayerUI/ActionButtons/ActionButton_Give")
+player_buttons_root = NodePath("LocalPlayerUI/PlayerButtons")
+player_buttons = [NodePath("LocalPlayerUI/PlayerButtons/PlayerButton_0"), NodePath("LocalPlayerUI/PlayerButtons/PlayerButton_1"), NodePath("LocalPlayerUI/PlayerButtons/PlayerButton_2"), NodePath("LocalPlayerUI/PlayerButtons/PlayerButton_3"), NodePath("LocalPlayerUI/PlayerButtons/PlayerButton_4"), NodePath("LocalPlayerUI/PlayerButtons/PlayerButton_5")]
+metadata/_custom_type_script = "uid://c4elqh78yqv4s"
+
+[node name="LocalPlayerUI" type="Control" parent="." unique_id=531770496]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ActionButtons" type="HBoxContainer" parent="LocalPlayerUI" unique_id=568995761]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -306.0
+offset_top = -63.0
+offset_right = 306.0
+offset_bottom = -23.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ActionButton_Hit" type="Button" parent="LocalPlayerUI/ActionButtons" unique_id=103649311]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Hit"
+
+[node name="ActionButton_Stand" type="Button" parent="LocalPlayerUI/ActionButtons" unique_id=1873220369]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Stand"
+
+[node name="ActionButton_Steal" type="Button" parent="LocalPlayerUI/ActionButtons" unique_id=559018437]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Steal"
+
+[node name="ActionButton_Give" type="Button" parent="LocalPlayerUI/ActionButtons" unique_id=579491312]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Give"
+
+[node name="PlayerButtons" type="HBoxContainer" parent="LocalPlayerUI" unique_id=744926394]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -460.0
+offset_top = -117.0
+offset_right = 460.0
+offset_bottom = -77.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="PlayerButton_5" type="Button" parent="LocalPlayerUI/PlayerButtons" unique_id=1408681546]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Dealer"
+
+[node name="PlayerButton_4" type="Button" parent="LocalPlayerUI/PlayerButtons" unique_id=1139619253]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Player 5"
+
+[node name="PlayerButton_3" type="Button" parent="LocalPlayerUI/PlayerButtons" unique_id=1949102819]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Player 4"
+
+[node name="PlayerButton_2" type="Button" parent="LocalPlayerUI/PlayerButtons" unique_id=611798361]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Player 3"
+
+[node name="PlayerButton_1" type="Button" parent="LocalPlayerUI/PlayerButtons" unique_id=1436590231]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Player 2"
+
+[node name="PlayerButton_0" type="Button" parent="LocalPlayerUI/PlayerButtons" unique_id=116462237]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme = ExtResource("2_gwgup")
+text = "Player 1"

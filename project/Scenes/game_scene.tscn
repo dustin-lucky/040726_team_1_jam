@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://d0moxtqyq6b40" path="res://Scripts/game_manager.gd" id="1_fiftr"]
 [ext_resource type="PackedScene" uid="uid://cympuolpeepu8" path="res://Scenes/table.tscn" id="1_x87qo"]
 [ext_resource type="Script" uid="uid://d2akwu4uhynld" path="res://Scripts/card_mover.gd" id="2_fiftr"]
+[ext_resource type="PackedScene" uid="uid://6sk75a564j7p" path="res://Scenes/local_player_ui.tscn" id="5_1ixah"]
 
 [node name="GameScene" type="Node2D" unique_id=785157636]
 
@@ -24,3 +25,5 @@ script = ExtResource("2_fiftr")
 metadata/_custom_type_script = "uid://d2akwu4uhynld"
 
 [node name="Table" parent="." unique_id=17428438 instance=ExtResource("1_x87qo")]
+
+[node name="CanvasLayer" parent="." unique_id=605253831 instance=ExtResource("5_1ixah")]
