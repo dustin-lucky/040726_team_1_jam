@@ -146,14 +146,14 @@ func _on_create_game_pressed() -> void:
 			"host_name": host_name,
 		}))
 
-	create_button.text = "Game Created!  (code: %s)" % _room_code
+	create_button.text = "Game Created!"
 	create_button.disabled = true
 
 	# Add a Start Game button below the create button
 	var start_btn := Button.new()
 	start_btn.name = "StartGameButton"
 	start_btn.text = "▶  Start Game"
-	start_btn.theme_override_font_sizes["font_size"] = 22
+	start_btn.add_theme_font_size_override("font_size", 22)
 	start_btn.pressed.connect(_on_start_game_pressed)
 	var vbox := $CenterContainer/VBoxContainer as VBoxContainer
 	vbox.add_child(start_btn)
@@ -161,24 +161,55 @@ func _on_create_game_pressed() -> void:
 
 
 func _on_start_game_pressed() -> void:
+	_disconnect_network_lobby_signals()
 	NetworkManager.setup_host(_room_code, _get_name())
-	NetworkManager.game_room_ready.connect(_on_game_room_ready, CONNECT_ONE_SHOT)
+	NetworkManager.game_room_ready.connect(_on_host_game_room_ready, CONNECT_ONE_SHOT)
 	NetworkManager.connect_to_game_room()
+
+
+func _on_host_game_room_ready() -> void:
+	# Broadcast start_game to all clients then enter the game ourselves
+	NetworkManager.send({"type": "start_game"})
+	get_tree().change_scene_to_file("res://Scenes/game_scene.tscn")
 
 
 func _on_join_game_pressed() -> void:
 	if _selected_code.is_empty() or not _connected:
 		return
+	_disconnect_network_lobby_signals()
 	_ws.send_text(JSON.stringify({
 		"type": "join_game",
 		"code": _selected_code,
 	}))
 	NetworkManager.setup_client(_selected_code, _get_name())
-	NetworkManager.game_room_ready.connect(_on_game_room_ready, CONNECT_ONE_SHOT)
+	NetworkManager.game_room_ready.connect(_on_client_game_room_ready, CONNECT_ONE_SHOT)
 	NetworkManager.connect_to_game_room()
 
 
-func _on_game_room_ready() -> void:
+func _on_client_game_room_ready() -> void:
+	# Show waiting UI — don't enter game until host sends start_game
+	join_button.disabled = true
+	create_button.disabled = true
+	var waiting_label := Label.new()
+	waiting_label.name = "WaitingLabel"
+	waiting_label.text = "Waiting for host to start the game..."
+	waiting_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	($CenterContainer/VBoxContainer as VBoxContainer).add_child(waiting_label)
+	NetworkManager.game_started.connect(_on_game_started, CONNECT_ONE_SHOT)
+	# Defer accepting start_game so joined + start_game in one poll cannot skip this UI.
+	NetworkManager.call_deferred("mark_client_ready_to_receive_start_game")
+
+
+func _disconnect_network_lobby_signals() -> void:
+	if NetworkManager.game_started.is_connected(_on_game_started):
+		NetworkManager.game_started.disconnect(_on_game_started)
+	if NetworkManager.game_room_ready.is_connected(_on_client_game_room_ready):
+		NetworkManager.game_room_ready.disconnect(_on_client_game_room_ready)
+	if NetworkManager.game_room_ready.is_connected(_on_host_game_room_ready):
+		NetworkManager.game_room_ready.disconnect(_on_host_game_room_ready)
+
+
+func _on_game_started() -> void:
 	get_tree().change_scene_to_file("res://Scenes/game_scene.tscn")
 
 

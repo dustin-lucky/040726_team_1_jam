@@ -13,11 +13,17 @@ var my_peer_id: int = -1
 var players: Array[Dictionary] = []
 
 signal player_joined(peer_id: int, player_name: String, player_index: int)
-signal player_left(peer_id: int)
+signal player_left(peer_id: int, player_index: int)
 signal game_room_ready()
+signal game_started()
 
 var _ws := WebSocketPeer.new()
 var _ready_emitted := false
+
+# Joiners only react to start_game after lobby shows "waiting" (avoids same-packet
+# joined + start_game skipping the wait UI; also buffers until host starts later).
+var _client_accepts_start_game: bool = false
+var _pending_client_start_game: bool = false
 
 
 func setup_host(code: String, host_name: String) -> void:
@@ -27,6 +33,8 @@ func setup_host(code: String, host_name: String) -> void:
 	my_name = host_name
 	players.clear()
 	_ready_emitted = false
+	_client_accepts_start_game = false
+	_pending_client_start_game = false
 
 
 func setup_client(code: String, client_name: String) -> void:
@@ -36,6 +44,17 @@ func setup_client(code: String, client_name: String) -> void:
 	my_name = client_name
 	players.clear()
 	_ready_emitted = false
+	_client_accepts_start_game = false
+	_pending_client_start_game = false
+
+
+func mark_client_ready_to_receive_start_game() -> void:
+	if not is_multiplayer or is_host:
+		return
+	_client_accepts_start_game = true
+	if _pending_client_start_game:
+		_pending_client_start_game = false
+		game_started.emit()
 
 
 func connect_to_game_room() -> void:
@@ -85,8 +104,21 @@ func _handle_message(text: String) -> void:
 			player_joined.emit(entry["peer_id"], entry["name"], entry["player_index"])
 		"peer_left":
 			var pid := int(data["peer_id"])
+			var left_index := -1
+			for p in players:
+				if p["peer_id"] == pid:
+					left_index = p["player_index"]
+					break
 			players = players.filter(func(p: Dictionary) -> bool: return p["peer_id"] != pid)
-			player_left.emit(pid)
+			player_left.emit(pid, left_index)
+		"start_game":
+			# Host never receives their own relayed start_game; ignore if we did.
+			if is_host:
+				return
+			if not _client_accepts_start_game:
+				_pending_client_start_game = true
+				return
+			game_started.emit()
 
 
 func get_player_name(player_index: int) -> String:
