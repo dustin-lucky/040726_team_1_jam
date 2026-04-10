@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameRules="*uid://bkaij6apr5x82"
 GlobalSignals="*uid://puh3mlipbbs3"
+LocalUI="*uid://6sk75a564j7p"
 
 [display]
 

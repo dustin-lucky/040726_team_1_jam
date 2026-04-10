@@ -15,7 +15,14 @@ func _on_action_requested(player_states: Array[Player]) -> void:
 			print("%s chose action: GIVE (busted at %d)" % [my_player.name, my_score])
 			action_ready.emit()
 			return
-
+	
+	# Only hit below 15 — too risky above that threshold.
+	if my_score < 10:
+		action.chosen_action = Hand.Action.HIT
+		print("%s chose action: HIT (score %d)" % [my_player.name, my_score])
+		action_ready.emit()
+		return
+	
 	# Steal a card if doing so would bring us closer to 21 without going over.
 	var best_steal_target: Player = _find_best_steal_target(my_player, player_states)
 	if best_steal_target != null:
