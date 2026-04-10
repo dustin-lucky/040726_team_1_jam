@@ -87,6 +87,21 @@ export default class BjServer implements Party.Server {
       return;
     }
 
+    // Lobby-specific: a player joined an open game
+    if (this.isLobby && data.type === "join_game") {
+      const game = this.games.get(data.code);
+      if (game) {
+        game.player_count += 1;
+        this.room.broadcast(
+          JSON.stringify({
+            type: "game_updated",
+            game: { code: game.code, host_name: game.host_name, player_count: game.player_count },
+          })
+        );
+      }
+      return;
+    }
+
     // Default relay: forward to one peer (data.to set) or broadcast to all
     if (data.to !== undefined) {
       for (const [cid, pid] of this.peers) {

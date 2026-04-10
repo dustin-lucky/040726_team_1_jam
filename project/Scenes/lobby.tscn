@@ -109,3 +109,4 @@ horizontal_alignment = 1
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/PlayLocalButton" to="." method="_on_play_local_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/CreateGameButton" to="." method="_on_create_game_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/JoinGameButton" to="." method="_on_join_game_pressed"]

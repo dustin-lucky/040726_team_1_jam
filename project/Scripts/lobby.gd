@@ -16,16 +16,19 @@ var _ws := WebSocketPeer.new()
 var _connected := false
 var _my_peer_id := -1
 var _room_code := ""
+var _selected_code := ""
 
 @onready var name_input: LineEdit = $CenterContainer/VBoxContainer/NameRow/NameInput
 @onready var create_button: Button = $CenterContainer/VBoxContainer/CreateGameButton
+@onready var join_button: Button = $CenterContainer/VBoxContainer/JoinGameButton
 @onready var games_list: VBoxContainer = $CenterContainer/VBoxContainer/GamesListPanel/ScrollContainer/GamesList
 @onready var no_games_label: Label = $CenterContainer/VBoxContainer/GamesListPanel/ScrollContainer/GamesList/NoGamesLabel
 
 
 func _ready() -> void:
 	name_input.text = PLAYER_NAMES[randi() % PLAYER_NAMES.size()]
-	create_button.disabled = true  # enabled once WS connects
+	create_button.disabled = true
+	join_button.disabled = true
 	_ws.connect_to_url(LOBBY_URL)
 
 
@@ -55,6 +58,9 @@ func _handle_message(text: String) -> void:
 		"game_added":
 			var g: Dictionary = data["game"]
 			_add_game_row(g["code"], g["host_name"], g["player_count"])
+		"game_updated":
+			var g: Dictionary = data["game"]
+			_update_game_row(g["code"], g["host_name"], g["player_count"])
 		"remove_game":
 			_remove_game_row(data["code"])
 
@@ -64,24 +70,46 @@ func _add_game_row(code: String, host_name: String, player_count: int) -> void:
 	if games_list.find_child(row_name, false, false):
 		return  # already listed
 
-	var row := HBoxContainer.new()
-	row.name = row_name
+	var btn := Button.new()
+	btn.name = row_name
+	btn.text = _row_text(host_name, player_count)
+	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	btn.pressed.connect(_on_row_selected.bind(code))
+	games_list.add_child(btn)
 
-	var lbl := Label.new()
-	lbl.text = "%s's Game  ·  %d / 5 players" % [host_name, player_count]
-	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(lbl)
-
-	games_list.add_child(row)
 	no_games_label.visible = false
+
+	# Auto-select if nothing is selected yet
+	if _selected_code.is_empty():
+		_on_row_selected(code)
+
+
+func _update_game_row(code: String, host_name: String, player_count: int) -> void:
+	var btn := games_list.find_child("game_" + code, false, false) as Button
+	if btn:
+		btn.text = _row_text(host_name, player_count)
 
 
 func _remove_game_row(code: String) -> void:
 	var row := games_list.find_child("game_" + code, false, false)
 	if row:
 		row.queue_free()
-	# Check next frame whether any game rows remain
+	if _selected_code == code:
+		_selected_code = ""
+		join_button.disabled = true
 	_refresh_no_games_label.call_deferred()
+	_auto_select_first.call_deferred()
+
+
+func _on_row_selected(code: String) -> void:
+	_selected_code = code
+	join_button.disabled = false
+	# Highlight selected row, un-highlight others
+	for child in games_list.get_children():
+		if child is Button:
+			var is_selected := child.name == "game_" + code
+			child.modulate = Color(1.4, 1.4, 0.6) if is_selected else Color.WHITE
 
 
 func _refresh_no_games_label() -> void:
@@ -91,6 +119,20 @@ func _refresh_no_games_label() -> void:
 			has_games = true
 			break
 	no_games_label.visible = not has_games
+
+
+func _auto_select_first() -> void:
+	if not _selected_code.is_empty():
+		return
+	for child in games_list.get_children():
+		if child.name.begins_with("game_"):
+			var code := child.name.trim_prefix("game_")
+			_on_row_selected(code)
+			break
+
+
+func _row_text(host_name: String, player_count: int) -> String:
+	return "%s's Game  ·  %d / 5 players" % [host_name, player_count]
 
 
 func _on_play_local_pressed() -> void:
@@ -113,6 +155,16 @@ func _on_create_game_pressed() -> void:
 
 	create_button.text = "Game Created!  (code: %s)" % _room_code
 	create_button.disabled = true
+
+
+func _on_join_game_pressed() -> void:
+	if _selected_code.is_empty() or not _connected:
+		return
+	_ws.send_text(JSON.stringify({
+		"type": "join_game",
+		"code": _selected_code,
+	}))
+	get_tree().change_scene_to_file("res://Scenes/game_scene.tscn")
 
 
 func _generate_code() -> String:
