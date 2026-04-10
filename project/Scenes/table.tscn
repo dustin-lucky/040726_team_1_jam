@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cympuolpeepu8"]
 
 [ext_resource type="Script" uid="uid://dlaitlplg7x3i" path="res://Scripts/table.gd" id="1_ix8et"]
-[ext_resource type="Texture2D" uid="uid://dy1ifdfmitlem" path="res://Graphics/Sprites/black_jack_table.png" id="2_4ppvu"]
 [ext_resource type="PackedScene" uid="uid://dnrmd26d2y831" path="res://Scenes/deck.tscn" id="2_5cpa6"]
+[ext_resource type="Texture2D" uid="uid://bb7f301oova4n" path="res://Graphics/Sprites/Blackjack_Table.png" id="3_4ntqo"]
 [ext_resource type="Script" uid="uid://c4fldivkqqgpc" path="res://Scripts/discard_pile.gd" id="4_usajj"]
 [ext_resource type="Script" uid="uid://dqbbuqlrmk3sy" path="res://Scripts/shoe.gd" id="5_o4lkm"]
 [ext_resource type="PackedScene" uid="uid://drj7r3a73nefs" path="res://Scenes/dealer.tscn" id="6_xexre"]
@@ -20,9 +20,9 @@ players = [NodePath("Players/Player1"), NodePath("Players/Player2"), NodePath("P
 metadata/_custom_type_script = "uid://dlaitlplg7x3i"
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1494325744]
-position = Vector2(806.22217, 453.5)
-scale = Vector2(0.63925916, 0.6392592)
-texture = ExtResource("2_4ppvu")
+position = Vector2(799.9998, 450)
+scale = Vector2(0.9999998, 1)
+texture = ExtResource("3_4ntqo")
 
 [node name="DiscardPile" type="Node2D" parent="." unique_id=540264828]
 position = Vector2(479, 125.000015)
@@ -47,7 +47,7 @@ script = ExtResource("8_xexre")
 metadata/_custom_type_script = "uid://nw2d22w3bo8q"
 
 [node name="Player1" parent="Players" unique_id=1199885999 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
-position = Vector2(1197, 485.99994)
+position = Vector2(1170, 445.00012)
 rotation = -0.80144507
 action_selector = NodePath("ActionSelector_Defensive")
 
@@ -55,8 +55,8 @@ action_selector = NodePath("ActionSelector_Defensive")
 script = ExtResource("9_xexre")
 
 [node name="Player2" parent="Players" unique_id=25345839 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
-position = Vector2(1019, 612)
-rotation = -0.49479318
+position = Vector2(1001.00006, 559)
+rotation = -0.38179857
 action_selector = NodePath("ActionSelector_Defensive")
 
 [node name="ActionSelector_Defensive" type="Node" parent="Players/Player2" unique_id=1420629303]
@@ -64,7 +64,7 @@ script = ExtResource("9_xexre")
 metadata/_custom_type_script = "uid://bccy4dwc6nadn"
 
 [node name="Player3" parent="Players" unique_id=470449269 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
-position = Vector2(806, 660)
+position = Vector2(802, 601)
 action_selector = NodePath("ActionSelector_LocalPlayer")
 
 [node name="ActionSelector_LocalPlayer" type="Node" parent="Players/Player3" unique_id=701417598]
@@ -72,8 +72,8 @@ script = ExtResource("10_4ntqo")
 metadata/_custom_type_script = "uid://cni54gu0avg7r"
 
 [node name="Player4" parent="Players" unique_id=1491228057 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
-position = Vector2(594, 612)
-rotation = 0.51088536
+position = Vector2(599, 560)
+rotation = 0.4643979
 action_selector = NodePath("ActionSelector_Defensive")
 
 [node name="ActionSelector_Defensive" type="Node" parent="Players/Player4" unique_id=513989061]
@@ -81,8 +81,8 @@ script = ExtResource("9_xexre")
 metadata/_custom_type_script = "uid://bccy4dwc6nadn"
 
 [node name="Player5" parent="Players" unique_id=758838861 node_paths=PackedStringArray("action_selector") instance=ExtResource("7_usajj")]
-position = Vector2(416.00003, 488.00003)
-rotation = 0.83523464
+position = Vector2(436.00003, 440.00003)
+rotation = 0.8671745
 action_selector = NodePath("ActionSelector_Defensive")
 
 [node name="ActionSelector_Defensive" type="Node" parent="Players/Player5" unique_id=1582635462]
