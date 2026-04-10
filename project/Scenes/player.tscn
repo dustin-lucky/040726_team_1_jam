@@ -3,11 +3,20 @@
 [ext_resource type="Script" uid="uid://duhpidrwqq48n" path="res://Scripts/player.gd" id="1_v0iea"]
 [ext_resource type="Script" uid="uid://cqycmtekgabtn" path="res://Scripts/hand.gd" id="2_cvnsp"]
 [ext_resource type="Script" uid="uid://bito4sin4rnnq" path="res://Scripts/player_ui.gd" id="3_6t5aa"]
+[ext_resource type="Texture2D" uid="uid://hknkij8634dy" path="res://Graphics/Sprites/Win.png" id="3_8erm5"]
+[ext_resource type="Texture2D" uid="uid://dpa0j18s47ejo" path="res://Graphics/Sprites/YOINK.png" id="4_f1ek2"]
 [ext_resource type="Theme" uid="uid://bldenm1oj6xkx" path="res://Graphics/UI Themes/game_theme.tres" id="4_vgqql"]
+[ext_resource type="Texture2D" uid="uid://bsrdf76beaftx" path="res://Graphics/Sprites/Lose.png" id="5_fkybt"]
+[ext_resource type="Texture2D" uid="uid://d2dm6e8s1hut2" path="res://Graphics/Sprites/WHAM.png" id="5_tx1dd"]
 
-[node name="Player" type="Node2D" unique_id=1199885999 node_paths=PackedStringArray("hand")]
+[node name="Player" type="Node2D" unique_id=1199885999 node_paths=PackedStringArray("hand", "effect_sprite")]
 script = ExtResource("1_v0iea")
 hand = NodePath("Hand")
+lose_texture = ExtResource("5_fkybt")
+win_texture = ExtResource("3_8erm5")
+steal_texture = ExtResource("4_f1ek2")
+give_texture = ExtResource("5_tx1dd")
+effect_sprite = NodePath("Sprite2D")
 metadata/_custom_type_script = "uid://duhpidrwqq48n"
 
 [node name="Hand" type="Node2D" parent="." unique_id=1178869052]
@@ -69,3 +78,8 @@ theme_override_constants/outline_size = 4
 theme_override_font_sizes/normal_font_size = 20
 fit_content = true
 horizontal_alignment = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2062708267]
+z_index = 53
+scale = Vector2(1e-05, 1e-05)
+texture = ExtResource("5_fkybt")
